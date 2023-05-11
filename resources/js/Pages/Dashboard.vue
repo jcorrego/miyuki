@@ -1,6 +1,11 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head } from '@inertiajs/vue3';
+import Bead from '@/Miyuki/Bead.vue';
+import ColorSelector from '@/Miyuki/ColorSelector.vue';
+import SquarePattern from '@/Miyuki/Patterns/SquarePattern.vue';
+import { useCurrentColorStore } from '@/stores/color_store'
+const store = useCurrentColorStore()
 </script>
 
 <template>
@@ -13,8 +18,11 @@ import { Head } from '@inertiajs/vue3';
 
         <div class="py-12">
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                    <div class="p-6 text-gray-900">You're logged in!</div>
+                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
+
+                    <ColorSelector  @color-selected="(color) => store.setColor(color)"/>
+                    <SquarePattern />
+
                 </div>
             </div>
         </div>

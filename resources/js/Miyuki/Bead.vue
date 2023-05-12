@@ -2,10 +2,9 @@
   import { computed, ref } from 'vue';
   import { useCurrentColorStore } from '@/stores/color_store'
   const store = useCurrentColorStore()
-
-  const isActive = ref(false);
-
-  const color = ref('white');
+  const props = defineProps({ initialColor: 'white' })
+  const isActive = ref(props.initialColor != 'white');
+  const color = ref(props.initialColor)
 
   const bgClasses = computed(() => {
     if (color.value !== 'white' && isActive.value) {
@@ -18,23 +17,23 @@
     color.value = activeColor;
   };
 
-  const handleClick = () => {
+  const handleClick = ($emit) => {
     isActive.value = !isActive.value;
+    let color = 'white'
     if (isActive.value) {
-      setColor(store.color)
+      color = store.color
     }
-    else {
-      setColor('white')
-    }
+    setColor(color)
+    $emit('setColor', color)
   };
 
 </script>
 
 <template>
     <div
-      class="border border-gray-300 rounded-sm cursor-pointer h-full w-full bg-gradient-to-b mr-1"
+      class="border border-gray-300 rounded-sm cursor-pointer h-full w-full bg-gradient-to-r mr-1"
       :class="bgClasses"
-      @click="handleClick"
+      @click="handleClick($emit)"
     >
         <div class="w-full h-full"></div>
     </div>

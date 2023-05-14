@@ -1,9 +1,11 @@
 <script setup >
   import { ref } from 'vue';
+  import Checkbox from '@/Components/Checkbox.vue';
   import { useCurrentColorStore } from '@/stores/color_store'
   const store = useCurrentColorStore()
 
   const colors = ref(['white', 'slate', 'red', 'orange', 'amber', 'yellow', 'lime', 'green', 'emerald', 'teal', 'cyan', 'sky', 'blue', 'indigo', 'violet', 'purple', 'fuchsia', 'pink', 'rose']);
+  const guides = ref(false);
   const classes = ref([
     'from-slate-400', 'via-slate-500', 'to-slate-900',
     'from-red-400', 'via-red-500', 'to-red-900',
@@ -43,8 +45,14 @@
 </script>
 
 <template>
-  <div class="flex p-4 items-center w-full border mb-4 justify-center bg-slate-50">
-    <div class="mr-2 text-gray-600 text-sm">Pick a color:</div>
-    <div v-for="color in colors" :key="color" @click="$emit('colorSelected', color)" class="border rounded-md cursor-pointer h-8 w-8 bg-gradient-to-b" :class="bgClasses(color)"></div>
+  <div class="flex flex-col bg-slate-50 border mb-4">
+    <div class="flex p-4 items-center w-full  mb-4 justify-center ">
+      <div class="mr-2 text-gray-600 text-sm">Pick a color:</div>
+      <div v-for="color in colors" :key="color" @click="$emit('colorSelected', color)" class="border rounded-md cursor-pointer h-8 w-8 bg-gradient-to-b" :class="bgClasses(color)"></div>
+    </div>
+    <div class="flex p-4 items-center w-full justify-center">
+      <div class="mr-2 text-gray-600 text-sm">Show guides:</div>
+      <Checkbox name="guides" @click="$emit('toggleGuides')" :checked="store.guides"/>
+    </div>
   </div>
 </template>

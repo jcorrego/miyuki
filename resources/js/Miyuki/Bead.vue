@@ -2,7 +2,7 @@
   import { computed, ref } from 'vue';
   import { useCurrentColorStore } from '@/stores/color_store'
   const store = useCurrentColorStore()
-  const props = defineProps({ initialColor: 'white' })
+  const props = defineProps({ initialColor: 'white', colorCount: 0 })
   const isActive = ref(props.initialColor != 'white');
   const color = ref(props.initialColor)
 
@@ -35,6 +35,8 @@
       :class="bgClasses"
       @click="handleClick($emit)"
     >
-        <div class="w-full h-full"></div>
+        <div class="w-full h-full">
+          <div v-if="store.guides && props.colorCount > 1" class="text-xs text-center leading-none align-middle text-black font-semibold">{{ props.colorCount }}</div>
+        </div>
     </div>
 </template>

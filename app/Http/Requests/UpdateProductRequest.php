@@ -28,7 +28,7 @@ class UpdateProductRequest extends FormRequest
             'width' => ['numeric', 'min:1', 'max:1000'],
             'long' => ['numeric', 'min:1', 'max:1000'],
             'type' => ['max:50'],
-            'name' => ['unique:products', 'min:3', 'max:250'],
+            'name' => ['min:3', 'max:250'],
         ];
     }
 }

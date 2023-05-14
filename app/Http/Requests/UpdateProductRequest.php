@@ -27,8 +27,8 @@ class UpdateProductRequest extends FormRequest
             'bead_color' => ['string', 'max:50'],
             'width' => ['numeric', 'min:1', 'max:1000'],
             'long' => ['numeric', 'min:1', 'max:1000'],
-            'type' => ['required', 'max:50'],
-            'name' => ['required', 'unique:products', 'min:3', 'max:250'],
+            'type' => ['max:50'],
+            'name' => ['unique:products', 'min:3', 'max:250'],
         ];
     }
 }

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreDelicaRequest;
 use App\Http\Requests\UpdateDelicaRequest;
 use App\Models\Delica;
+use App\Models\Product;
 use DOMDocument;
 use DOMXPath;
 use Inertia\Inertia;
@@ -22,7 +23,8 @@ class DelicaController extends Controller
             'delicas' => Delica::where('code', 'like', '%' . $q . '%')
                 ->orWhere('name', 'like', '%' . $q . '%')
                 ->orWhere('color', 'like', '%' . $q . '%')
-            ->orderBy('code')->get()
+            ->orderBy('code')->get(),
+            'products' => Product::all()
         ]);
     }
 
@@ -110,7 +112,13 @@ class DelicaController extends Controller
      */
     public function update(UpdateDelicaRequest $request, Delica $delica)
     {
-        //
+        if ($request->has('product_add')) {
+            // Add the delica to the product
+            if ($delica->products()->where('product_id', $request->product_add)->count() == 0 ){
+                $delica->products()->attach($request->product_add);
+            }
+
+        }
     }
 
     /**

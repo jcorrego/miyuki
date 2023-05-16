@@ -24,7 +24,7 @@ class UpdateProductRequest extends FormRequest
         return [
             'bead_row' => ['numeric', 'min:1', 'max:1000'],
             'bead_col' => ['numeric', 'min:1', 'max:1000'],
-            'bead_color' => ['string', 'max:50'],
+            'bead_delica' => ['numeric'],
             'width' => ['numeric', 'min:1', 'max:1000'],
             'long' => ['numeric', 'min:1', 'max:1000'],
             'type' => ['max:50'],

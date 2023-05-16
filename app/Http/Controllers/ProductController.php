@@ -52,13 +52,22 @@ class ProductController extends Controller
      */
     public function show(Product $product)
     {
+        $delicas = [];
+        foreach ($product->delicas as $delica) {
+            $delicas[$delica->id] = $delica;
+        }
+        $delicas = collect($delicas);
         $beads = [];
         foreach ($product->beads as $bead) {
-            $beads[$bead->row . '-' . $bead->col] = $bead->color;
+            if ($bead->delica) {
+                $beads[$bead->row . '-' . $bead->col] = $bead->delica;
+            }
         }
+
         return Inertia::render('Product/Show', [
             'product' => $product,
-            'beads' => $beads
+            'beads' => $beads,
+            'delicas' => $delicas,
         ]);
     }
 
@@ -76,8 +85,8 @@ class ProductController extends Controller
      */
     public function update(UpdateProductRequest $request, Product $product)
     {
-        if ($request->has('bead_color')) {
-            if ($request->bead_color === 'white') {
+        if ($request->has('bead_delica')) {
+            if (empty($request->bead_delica)) {
                 Bead::where('product_id', $product->id)
                     ->where('row', $request->bead_row)
                     ->where('col', $request->bead_col)
@@ -89,7 +98,7 @@ class ProductController extends Controller
                 'row' => $request->bead_row,
                 'col' => $request->bead_col,
             ]);
-            $bead->color = $request->bead_color;
+            $bead->delica()->associate($request->bead_delica);
             $bead->save();
         }
         elseif ($request->has('width')) {

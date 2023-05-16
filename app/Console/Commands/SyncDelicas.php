@@ -32,13 +32,13 @@ class SyncDelicas extends Command
     {
         $doc = new DOMDocument();
         $url = 'https://www.threadabead.com/Delica_Colours.aspx';
-        $content = file_get_contents(resource_path('1.html'));
+        $content = file_get_contents(resource_path('3.html')); // 1.html, 2.html, 3.html
         @$doc->loadHTML($content);
         $xpath = new DOMXPath($doc);
         $details = $xpath->query("//*[local-name()='img' and contains(concat(' ', normalize-space(@class), ' '), ' dxeImage ')]");
         $bar = $this->output->createProgressBar(count($details));
         $bar->start();
-        $next = '2412';
+        $next = '5708';
         $found = false;
         foreach ($details as $detail) {
             $bar->advance();
@@ -66,7 +66,6 @@ class SyncDelicas extends Command
             if (!isset($matches['code'])) {
                 preg_match('/(?P<code>DB \d{4}) (?P<name>[^\(]+)/', $title, $matches);
             }
-            preg_match('/(?P<code>DB \d{4}) (?P<name>[^\(]+)/', $title, $matches);
             if (isset($matches['code'])) {
                 $delica = Delica::firstOrNew([
                     'code' => $matches['code']

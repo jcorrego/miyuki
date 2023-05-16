@@ -2,6 +2,7 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head, useForm } from '@inertiajs/vue3';
 import ColorSelector from '@/Miyuki/ColorSelector.vue';
+import DelicaSelector from '@/Miyuki/DelicaSelector.vue';
 import Bead from '@/Miyuki/Bead.vue';
 import PreviewBead from '@/Miyuki/PreviewBead.vue';
 import { ref } from 'vue';
@@ -9,19 +10,19 @@ import { ref } from 'vue';
 import { useCurrentColorStore } from '@/stores/color_store'
 const store = useCurrentColorStore()
 
-const props = defineProps({ product: Object, beads: Object })
+const props = defineProps({ product: Object, beads: Object, delicas: Object })
 const rows = ref(props.product.width);
 const cols = ref(props.product.long);
 const type = ref(props.product.type);
 const name = ref(props.product.name);
 
-const getInitialColor = (row, col) => {
+const getInitialDelica = (row, col) => {
     if (props.beads.hasOwnProperty(row + '-' + col)) {
         return props.beads[row + '-' + col]
     }
-    return 'white'
+    return null
 }
-const getColorCount = (row, col) => {
+const getDelicaCount = (row, col) => {
    if (!props.beads.hasOwnProperty(row + '-' + col)) {
        return 0;
     }
@@ -45,7 +46,7 @@ const getColorCount = (row, col) => {
 const beadUpdateForm = useForm({
     bead_row: null,
     bead_col: null,
-    bead_color: 'white'
+    bead_delica: null
 })
 const productUpdateForm = useForm({
     width: null,
@@ -54,10 +55,11 @@ const productUpdateForm = useForm({
     name: null,
 })
 
-function submitBeadForm(color, row, col) {
+function submitBeadForm(delica, row, col) {
+    console.log(delica)
     beadUpdateForm.bead_row = row
     beadUpdateForm.bead_col = col
-    beadUpdateForm.bead_color = color
+    beadUpdateForm.bead_delica = delica.id
     beadUpdateForm.put('/products/' + props.product.id, {
         preserveState: true,
         preserveScroll: true,
@@ -91,6 +93,7 @@ function submitProductForm() {
                         @color-selected="(color) => store.setColor(color)"
                         @toggle-guides="store.toggleGuides()"
                         />
+                    <DelicaSelector :delicas="delicas" @delica-selected="(delica) => store.setDelica(delica)"/>
                     <div class="flex p-4 items-center w-full justify-center">
                         <div class="isolate flex -space-x-px rounded-md shadow-sm bg-white">
                             <div class="relative rounded-md rounded-r-none px-3 pb-1.5 pt-2.5 ring-1 ring-inset ring-gray-300 focus-within:z-10 focus-within:ring-2 focus-within:ring-indigo-600 flex flex-col justify-between w-24">
@@ -139,9 +142,9 @@ function submitProductForm() {
                                 </div>
                                 <div v-for="row in rows" :key="'row-' + row" class="gap-px flex" :class="{'ml-2': type === 'Peyote' && row % 2 == 0}">
                                     <div v-for="col in cols" :key="'col-' + col" class="h-4 w-5">
-                                        <Bead :key="row + '-' + col" @set-color="(color) =>submitBeadForm(color, row, col)"
-                                            :initial-color="getInitialColor(row, col)"
-                                            :color-count="getColorCount(row, col)"
+                                        <Bead :key="row + '-' + col" @set-delica="(delica) =>submitBeadForm(delica, row, col)"
+                                            :initial-delica="getInitialDelica(row, col)"
+                                            :delica-count="getDelicaCount(row, col)"
                                             />
                                     </div>
                                 </div>
@@ -155,7 +158,7 @@ function submitProductForm() {
                             <div>
                                 <div v-for="row in rows" :key="'row-' + row" class="gap-px flex" :class="{'ml-1': type === 'Peyote' && row % 2 == 0}">
                                     <div v-for="col in cols" :key="'col-' + col" class="h-1.5 w-2">
-                                        <PreviewBead :key="row + '-' + col" :color="getInitialColor(row, col)"/>
+                                        <PreviewBead :key="row + '-' + col" :color="getInitialDelica(row, col)"/>
                                     </div>
                                 </div>
                             </div>

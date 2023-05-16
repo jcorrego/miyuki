@@ -1,10 +1,8 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head, useForm } from '@inertiajs/vue3';
-import { ref } from 'vue';
 import { ExclamationCircleIcon } from '@heroicons/vue/20/solid'
 
-const name = ref('New Delica Bead')
 const form = useForm({
     source_url: null,
 })

@@ -2,40 +2,30 @@
   import { computed, ref } from 'vue';
   import { useCurrentColorStore } from '@/stores/color_store'
   const store = useCurrentColorStore()
-  const props = defineProps({ initialColor: 'white', colorCount: 0 })
-  const isActive = ref(props.initialColor != 'white');
-  const color = ref(props.initialColor)
+  const props = defineProps({ initialDelica: null, delicaCount: 0 })
+  const delica = ref(props.initialDelica)
 
   const bgClasses = computed(() => {
-    if (color.value !== 'white' && isActive.value) {
-      return `from-${color.value}-400 via-${color.value}-500 to-${color.value}-900`;
-    }
-    return 'from-gray-50 via-white to-gray-300';
+    return 'bg-gradient-to-r from-gray-50 via-white to-black opacity-25';
   });
 
-  const setColor = (activeColor) => {
-    color.value = activeColor;
-  };
-
   const handleClick = ($emit) => {
-    isActive.value = !isActive.value;
-    let color = 'white'
-    if (isActive.value) {
-      color = store.color
+    if (store.delica !== null) {
+      delica.value = store.delica
+      $emit('setDelica', delica.value)
     }
-    setColor(color)
-    $emit('setColor', color)
   };
 
 </script>
 
 <template>
     <div
-      class="border border-gray-300 rounded-sm cursor-pointer h-full w-full bg-gradient-to-r mr-1"
-      :class="bgClasses"
+      class="border border-gray-300 rounded-sm cursor-pointer h-full w-full mr-1"
       @click="handleClick($emit)"
     >
-        <div class="w-full h-full">
+        <div class="w-full h-full relative">
+          <div :class="bgClasses" class="h-full w-full absolute z-10 rounded-sm"></div>
+          <img v-if="delica" :src="delica.image_color_url" :alt="delica.name" class="object-none rounded-sm z-0 h-full w-full" />
           <div v-if="store.guides && props.colorCount > 1" class="text-xs text-center leading-none align-middle text-black font-semibold">{{ props.colorCount }}</div>
         </div>
     </div>

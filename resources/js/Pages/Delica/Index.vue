@@ -1,22 +1,29 @@
 <script setup>
 import { ref } from 'vue'
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import { Head, Link, router } from '@inertiajs/vue3';
-import { EllipsisVerticalIcon } from '@heroicons/vue/20/solid'
+import { Head, router, useForm } from '@inertiajs/vue3';
 import { Dialog, DialogPanel, TransitionChild, TransitionRoot } from '@headlessui/vue'
-import { HeartIcon, XMarkIcon } from '@heroicons/vue/24/outline'
-import { PencilIcon, PlusIcon } from '@heroicons/vue/20/solid'
+import { XMarkIcon } from '@heroicons/vue/24/outline'
 
-defineProps({ delicas: { type: Array } })
+defineProps({ delicas: Array, products: Array })
 const open = ref(false)
 const selectedDelica = ref(null)
 const search = ref('')
+const assignForm = useForm({
+    product_add: null,
+})
 
 function searchDelicas() {
     router.reload({
       data:{search: search.value },
       only: ['delicas']
     })
+}
+function assignDelica() {
+  assignForm.put('/delicas/' + selectedDelica.value.id, {
+        preserveScroll: true,
+        onSuccess: () => open.value = false,
+    });
 }
 
 function showDelica(delica) {
@@ -124,6 +131,20 @@ function showDelica(delica) {
                           <dd class="text-gray-900">{{ selectedDelica.material }}</dd>
                         </div>
                       </dl>
+                    </div>
+                    <div>
+                      <form @submit.prevent="assignDelica">
+                        <h3 class="font-medium text-gray-900">Add to design</h3>
+                        <div>
+                          <label for="product" class="block text-sm font-medium leading-6 text-gray-900">Product</label>
+                          <select v-model="assignForm.product_add" id="product" name="product" class="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6">
+                            <option v-for="product in products" :key="product.id" :value="product.id">{{ product.name }}</option>
+                          </select>
+                        </div>
+                        <div class="mt-2">
+                            <button type="submit" :disabled="assignForm.processing" class="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Assign</button>
+                        </div>
+                      </form>
                     </div>
                   </div>
                 </div>

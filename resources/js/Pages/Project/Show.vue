@@ -155,8 +155,8 @@ function submitProjectForm() {
                         <div class="w-4 bg-gradient-to-r from-slate-300 via-slate-100 to-slate-400"><div class="h-4 w-5"></div></div>
                         <div>
                             <div v-for="row in rows" :key="'row-' + row" class="gap-px flex" :class="{'ml-1': type === 'Peyote' && row % 2 == 0}">
-                                <div v-for="col in cols" :key="'col-' + col" class="h-1.5 w-2">
-                                    <PreviewBead :key="row + '-' + col" :color="getInitialDelica(row, col)"/>
+                                <div v-for="col in cols" :key="'col-' + col" class="h-2 w-2.5">
+                                    <PreviewBead :key="row + '-' + col" :delica="getInitialDelica(row, col)"/>
                                 </div>
                             </div>
                         </div>

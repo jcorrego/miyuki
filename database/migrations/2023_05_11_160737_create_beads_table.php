@@ -1,6 +1,6 @@
 <?php
 
-use App\Models\Product;
+use App\Models\Project;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -14,7 +14,7 @@ return new class extends Migration
     {
         Schema::create('beads', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(Product::class);
+            $table->foreignIdFor(Project::class);
             $table->integer('row');
             $table->integer('col');
             $table->string('color')->default('white');

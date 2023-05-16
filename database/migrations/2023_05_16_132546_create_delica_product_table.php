@@ -1,7 +1,7 @@
 <?php
 
 use App\Models\Delica;
-use App\Models\Product;
+use App\Models\Project;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -13,10 +13,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('delica_product', function (Blueprint $table) {
+        Schema::create('delica_project', function (Blueprint $table) {
             $table->id();
             $table->foreignIdFor(Delica::class);
-            $table->foreignIdFor(Product::class);
+            $table->foreignIdFor(Project::class);
             $table->timestamps();
         });
     }
@@ -26,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('delica_product');
+        Schema::dropIfExists('delica_project');
     }
 };

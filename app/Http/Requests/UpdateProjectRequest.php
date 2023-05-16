@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class UpdateDelicaRequest extends FormRequest
+class UpdateProjectRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,7 +22,13 @@ class UpdateDelicaRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'project_add' => ['exists:projects,id'],
+            'bead_row' => ['numeric', 'min:1', 'max:1000'],
+            'bead_col' => ['numeric', 'min:1', 'max:1000'],
+            'bead_delica' => ['numeric', 'nullable'],
+            'width' => ['numeric', 'min:1', 'max:1000'],
+            'long' => ['numeric', 'min:1', 'max:1000'],
+            'type' => ['max:50'],
+            'name' => ['min:3', 'max:250'],
         ];
     }
 }

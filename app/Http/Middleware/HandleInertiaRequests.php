@@ -30,7 +30,12 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
+        $projects = [];
+        if ($user = $request->user()) {
+            $projects = $user->projects()->orderBy('updated_at', 'desc')->limit(3)->get();
+        }
         return array_merge(parent::share($request), [
+            'recent' => $projects,
             'auth' => [
                 'user' => $request->user(),
             ],

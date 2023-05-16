@@ -13,11 +13,11 @@ class Delica extends Model
     protected $fillable = ['code'];
 
     /**
-     * The products that this delica is used in.
+     * The projects that this delica is used in.
      */
-    public function products(): BelongsToMany
+    public function projects(): BelongsToMany
     {
-        return $this->belongsToMany(Product::class)->withTimestamps();
+        return $this->belongsToMany(Project::class)->withTimestamps();
     }
 
     /**

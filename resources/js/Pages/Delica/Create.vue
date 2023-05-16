@@ -45,7 +45,7 @@ function submitForm() {
                                 </div>
                             </div>
                             <p v-if="form.errors.source_url" class="mt-2 text-sm text-red-600" id="name-error">{{ form.errors.source_url }}</p>
-                            <p v-else class="mt-2 text-sm text-gray-500" id="email-description">Please provide the detail url of the bead from <a class="text-violet-500" href="https://www.threadabead.com/Delica_Colours.aspx.">this</a> page. <br>This URL should look like: https://www.threadabead.com/Search_Select.aspx?shop=2&entry_id=1062</p>
+                            <p v-else class="mt-2 text-sm text-gray-500" id="email-description">Please provide the detail url of the bead from <a class="text-violet-500" target="_blank" href="https://www.threadabead.com/Delica_Colours.aspx">this</a> page. <br>This URL should look like: https://www.threadabead.com/Search_Select.aspx?shop=2&entry_id=1062</p>
                         </div>
                         <div class="mt-2">
                             <button type="submit" :disabled="form.processing" class="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Save</button>

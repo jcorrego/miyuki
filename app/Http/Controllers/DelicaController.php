@@ -17,8 +17,12 @@ class DelicaController extends Controller
      */
     public function index()
     {
+        $q = request()->query('search', '');
         return Inertia::render('Delica/Index', [
-            'delicas' => Delica::orderBy('code')->get()
+            'delicas' => Delica::where('code', 'like', '%' . $q . '%')
+                ->orWhere('name', 'like', '%' . $q . '%')
+                ->orWhere('color', 'like', '%' . $q . '%')
+            ->orderBy('code')->get()
         ]);
     }
 
@@ -44,7 +48,10 @@ class DelicaController extends Controller
         $content = file_get_contents($validated['source_url']);
         @$doc->loadHTML($content);
         $title = $doc->getElementById('ThreadABead_ContentPlaceHolder1_lbl_header')->nodeValue;
-        preg_match('/(?P<code>DB \d{4}) (?P<name>[^\(]+)/', $title, $matches);
+        preg_match('/(?P<code>DBS \d{4}) (?P<name>[^\(]+)/', $title, $matches);
+        if (!isset($matches['code'])) {
+            preg_match('/(?P<code>DB \d{4}) (?P<name>[^\(]+)/', $title, $matches);
+        }
         if (isset($matches['code'])) {
             $delica = Delica::firstOrNew([
                 'code' => $matches['code']

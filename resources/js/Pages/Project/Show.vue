@@ -1,6 +1,6 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import { Head, useForm } from '@inertiajs/vue3';
+import { Head, useForm, router } from '@inertiajs/vue3';
 import GuidesToggle from '@/Miyuki/GuidesToggle.vue';
 import DelicaSelector from '@/Miyuki/DelicaSelector.vue';
 import Bead from '@/Miyuki/Bead.vue';
@@ -15,32 +15,20 @@ const rows = ref(props.project.width);
 const cols = ref(props.project.long);
 const type = ref(props.project.type);
 const name = ref(props.project.name);
+const beads = ref(props.beads);
 
 const getInitialDelica = (row, col) => {
-    if (props.beads.hasOwnProperty(row + '-' + col)) {
-        return props.beads[row + '-' + col]
+    if (beads.value.hasOwnProperty(row + '-' + col)) {
+        return beads.value[row + '-' + col]
     }
     return null
 }
-const getDelicaCount = (row, col) => {
-   if (!props.beads.hasOwnProperty(row + '-' + col)) {
-       return 0;
+const getDelicaBadge = (row, col) => {
+   if (!beads.value.hasOwnProperty(row + '-' + col)) {
+       return null;
     }
-    let color = props.beads[row + '-' + col]
-    if (color === 'white') {
-        return 0;
-    }
-    let count = 1
-    for (let i = row - 1; i > 0; i--) {
-        if (props.beads.hasOwnProperty(i + '-' + col)) {
-            if (props.beads[i + '-' + col] === color) {
-                count++
-            } else {
-                break;
-            }
-        }
-    }
-    return count
+    let delica = beads.value[row + '-' + col]
+    return delica.badge
 }
 
 const beadUpdateForm = useForm({
@@ -62,7 +50,12 @@ function submitBeadForm(delica_id, row, col) {
     beadUpdateForm.put('/projects/' + props.project.id, {
         preserveState: true,
         preserveScroll: true,
+        onSuccess: (page) => {
+            beads.value = page.props.beads
+        },
     });
+
+
 }
 function submitProjectForm() {
     projectUpdateForm.width = rows
@@ -140,9 +133,10 @@ function submitProjectForm() {
                             </div>
                             <div v-for="row in rows" :key="'row-' + row" class="gap-px flex" :class="{'ml-2': type === 'Peyote' && row % 2 == 0}">
                                 <div v-for="col in cols" :key="'col-' + col" class="h-4 w-5">
-                                    <Bead :key="row + '-' + col" @set-delica="(delica_id) =>submitBeadForm(delica_id, row, col)"
+                                    <Bead :key="row + '-' + col"
+                                        @set-delica="(delica_id) =>submitBeadForm(delica_id, row, col)"
                                         :initial-delica="getInitialDelica(row, col)"
-                                        :delica-count="getDelicaCount(row, col)"
+                                        :badge="getDelicaBadge(row, col)"
                                         />
                                 </div>
                             </div>

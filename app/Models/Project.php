@@ -26,4 +26,42 @@ class Project extends Model
     {
         return $this->belongsToMany(Delica::class);
     }
+
+    /**
+     * Refresh all bead counters for this project.
+     */
+    public function refreshBeadCounters(): void
+    {
+        $beads = [];
+        foreach ($this->beads as $bead) {
+            $bead->badge = 1;
+            $bead->save();
+            $beads[$bead->row][$bead->col] = $bead;
+        }
+        for ($i = 1; $i <= $this->long; $i++) {
+            for ($j = 1; $j <= $this->width; $j++) {
+                if (isset($beads[$j][$i])) {
+                    $bead = $beads[$j][$i];
+                    if ($j > 1) {
+                        if (isset($beads[$j-1][$i])) {
+                            $previous_bead = $beads[$j-1][$i];
+                            if ($bead->delica->id === $previous_bead->delica->id) {
+                                $bead->badge = $previous_bead->badge + 1;
+                                $bead->save();
+                                $previous_bead->badge = 0;
+                                $previous_bead->save();
+                                continue;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        foreach ($this->beads as $bead) {
+            if ($bead->badge === 1) {
+                $bead->badge = 0;
+                $bead->save();
+            }
+        }
+    }
 }

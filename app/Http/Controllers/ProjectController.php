@@ -52,6 +52,7 @@ class ProjectController extends Controller
      */
     public function show(Project $project)
     {
+        $project->refreshBeadCounters();
         $delicas = [];
         foreach ($project->delicas as $delica) {
             $delicas[$delica->id] = $delica;
@@ -103,30 +104,6 @@ class ProjectController extends Controller
                 'row' => $request->bead_row,
                 'col' => $request->bead_col,
             ]);
-            if ($request->bead_row > 1) {
-                $count = 1;
-                $start = $request->bead_row - 1;
-                while ($start > 0) {
-                    $previous_bead = Bead::firstOrNew([
-                        'project_id' => $project->id,
-                        'row' => $start,
-                        'col' => $request->bead_col,
-                    ]);
-                    if (!$previous_bead) {
-                        break;
-                    }
-                    if ($previous_bead->delica_id !== $request->bead_delica) {
-                        break;
-                    }
-                    $previous_bead->badge = null;
-                    $previous_bead->save();
-                    $start--;
-                    $count++;
-                }
-                if ($count > 1) {
-                    $bead->badge = $count;
-                }
-            }
             $bead->delica()->associate($request->bead_delica);
             $bead->save();
         }

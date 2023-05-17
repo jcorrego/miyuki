@@ -94,9 +94,6 @@ class SyncDelicas extends Command
                     elseif ( Str::of($detail->nodeValue)->startsWith('Shape:') ) {
                         $delica->shape = Str::of($detail->nodeValue)->after('Shape:')->trim();
                     }
-                    else {
-                        // dump($detail->nodeValue);
-                    }
                 }
                 $delica->save();
             }

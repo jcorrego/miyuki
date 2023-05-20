@@ -55,21 +55,30 @@ class ProjectController extends Controller
         $project->refreshBeadCounters();
         $delicas = [];
         foreach ($project->delicas as $delica) {
-            $delicas[$delica->id] = $delica;
+            $delicas[$delica->id] = [
+                'id' => $delica->id,
+                'code' => $delica->code,
+                'name' => $delica->name,
+                'rgb' => $delica->rgb,
+                'count' => 0,
+            ];
         }
-        $delicas = collect($delicas);
         $beads = [];
         foreach ($project->beads as $bead) {
             if ($bead->delica) {
                 $beads[$bead->row . '-' . $bead->col] = [
                     'badge' => $bead->badge,
                     'id' => $bead->delica->id,
-                    'image_color_url' => $bead->delica->image_color_url,
+                    'rgb' => $bead->delica->rgb,
                     'name' => $bead->delica->name,
                 ];
+                $delicas[$bead->delica->id]['count']++;
             }
         }
-
+        // Sorts delicas by count, this lost the keys, but they are not used.
+        usort($delicas, function ($a, $b) {
+            return $a['count'] < $b['count'];
+        });
         return Inertia::render('Project/Show', [
             'project' => $project,
             'beads' => $beads,
@@ -111,6 +120,7 @@ class ProjectController extends Controller
             $project->width = $request->width;
             $project->long = $request->long;
             $project->type = $request->type;
+            $project->zoom = $request->zoom;
             $project->name = $request->name;
             $project->save();
             $beads = Bead::where('project_id', $project->id)

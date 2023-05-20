@@ -27,7 +27,7 @@ class OptimizeImages extends Command
      */
     public function handle()
     {
-        $delicas = Delica::where('image_photo_url', 'like', 'http%')->limit(10)->get();
+        $delicas = Delica::where('image_photo_url', 'like', 'http%')->limit(50)->get();
         foreach ($delicas as $delica) {
             $this->info('Processing delica ' . $delica->code . ' ' . $delica->image_photo_url . ' ...');
             $image = Image::make($delica->image_photo_url)->widen(320)->save('public/images/delicas/' . $delica->code . '.jpg', 60, 'jpg');

@@ -44,7 +44,7 @@ class ProjectController extends Controller
 
         $project->save();
 
-        return to_route('projects.index');
+        return to_route('projects.show', $project);
     }
 
     /**
@@ -70,7 +70,7 @@ class ProjectController extends Controller
                     'badge' => $bead->badge,
                     'id' => $bead->delica->id,
                     'rgb' => $bead->delica->rgb,
-                    'name' => $bead->delica->name,
+                    'code' => $bead->delica->code,
                 ];
                 $delicas[$bead->delica->id]['count']++;
             }
@@ -120,7 +120,6 @@ class ProjectController extends Controller
             $project->width = $request->width;
             $project->long = $request->long;
             $project->type = $request->type;
-            $project->zoom = $request->zoom;
             $project->name = $request->name;
             $project->save();
             $beads = Bead::where('project_id', $project->id)
@@ -137,6 +136,7 @@ class ProjectController extends Controller
      */
     public function destroy(Project $project)
     {
-        //
+        $project->delete();
+        return to_route('projects.index');
     }
 }

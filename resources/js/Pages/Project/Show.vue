@@ -1,6 +1,6 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import { Head, useForm, router } from '@inertiajs/vue3';
+import { Head, useForm } from '@inertiajs/vue3';
 import GuidesToggle from '@/Miyuki/GuidesToggle.vue';
 import Toolbox from '@/Miyuki/Toolbox.vue';
 import Bead from '@/Miyuki/Bead.vue';
@@ -21,7 +21,6 @@ const isSelecting = ref(false)
 const selectedBeads = ref([])
 
 const zoomClasses = computed(() => {
-    console.log(zoom.value)
     if (zoom.value == 1){
         return 'h-4 w-5'
     }
@@ -149,14 +148,38 @@ function mirrorSelection() {
 }
 
 function copySelection() {
+    selectedBeads.value.sort(function (a, b) {
+        let aRow = a.split('-')[0]
+        let aCol = a.split('-')[1]
+        let bRow = b.split('-')[0]
+        let bCol = b.split('-')[1]
+        if (aRow < bRow) {
+            return -1
+        }
+        else if (aRow > bRow) {
+            return 1
+        }
+        else {
+            if (aCol < bCol) {
+                return -1
+            }
+            else if (aCol > bCol) {
+                return 1
+            }
+            else {
+                return 0
+            }
+        }
+    })
     store.clipboard = selectedBeads.value
     selectedBeads.value = []
 }
 function pasteSelection() {
     // Get the first bead in the current selection
     let firstBead = selectedBeads.value[0]
-    let pasteRow = firstBead.split('-')[0]
-    let pasteCol = firstBead.split('-')[1]
+    let pasteRow = parseInt(firstBead.split('-')[0])
+    let pasteCol = parseInt(firstBead.split('-')[1])
+
     store.clipboard.forEach(function (item) {
         let row = item.split('-')[0]
         let col = item.split('-')[1]

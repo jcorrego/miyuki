@@ -1,5 +1,5 @@
 <script setup >
-  import { ref } from 'vue';
+  import { ref, watch } from 'vue';
   import { useToolsStore } from '@/stores/tools_store'
   const store = useToolsStore()
   const props = defineProps({ initialDelica: null, badge: null })
@@ -13,6 +13,21 @@
   const handleDoubleClick = () => {
     delica.value = null
   };
+  watch(() => props.initialDelica, (newDelica, oldDelica) => {
+    if (newDelica !== null) {
+      if (oldDelica !== null &&  newDelica.id !== oldDelica.id) {
+        delica.value = newDelica
+      }
+
+      return
+      if (newDelica.id !== oldDelica.id) {
+        delica.value = newDelica
+      }
+    }
+
+
+
+  })
 
 </script>
 
@@ -22,10 +37,10 @@
       @click="handleClick()"
       @dblclick="handleDoubleClick()"
     >
-        <div class="w-full h-full relative">
-          <div class="h-full w-full absolute z-10 rounded-sm bg-gradient-to-r from-gray-50 via-white to-black opacity-25"></div>
-          <div v-if="delica && delica.rgb" class="h-full w-full absolute z-10 rounded-sm" :style="'background-color:' + delica.rgb + ';'"></div>
-          <div v-if="store.guides && badge" class="left-1 px-0.5 text-2xs bg-stone-600 rounded text-center leading-none align-middle text-gray-300 font-semibold absolute top-0.5">{{ badge }}</div>
+        <div class="w-full h-full">
+          <div v-if="delica && delica.rgb" class="h-full w-full rounded-sm flex items-center justify-center hover:opacity-75" :style="'background-color:' + delica.rgb + ';'">
+              <span v-if="store.guides && badge" class="px-0.5 text-2xs bg-stone-600 rounded leading-none text-gray-300 font-semibold">{{ badge }}</span>
+          </div>
         </div>
     </div>
 </template>

@@ -1,8 +1,10 @@
 <?php
 
 use App\Http\Controllers\DelicaController;
+use App\Http\Controllers\DuplicatedProjectController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ProjectImageController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -33,6 +35,8 @@ Route::middleware('auth')->group(function () {
     Route::resource('delicas', DelicaController::class);
 
     Route::get('settings', [ProfileController::class, 'edit'])->name('settings');
+    Route::get('/projects/{project}/image', [ProjectImageController::class, 'show'])->name('projects.image.show');
+    Route::post('/projects/{project}/duplicate', [DuplicatedProjectController::class, 'store'])->name('projects.duplicate.store');
 });
 
 require __DIR__.'/auth.php';

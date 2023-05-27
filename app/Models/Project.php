@@ -11,6 +11,10 @@ class Project extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        'name',
+    ];
+
     /**
      * Get the beads for the project.
      */

@@ -11,6 +11,7 @@ class Bead extends Model
     use HasFactory;
 
     protected $guarded = [];
+    protected $with = ['delica'];
 
     /**
      * All of the relationships to be touched.

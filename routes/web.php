@@ -4,6 +4,7 @@ use App\Http\Controllers\DelicaController;
 use App\Http\Controllers\DuplicatedProjectController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ProjectBeadController;
 use App\Http\Controllers\ProjectImageController;
 use Illuminate\Support\Facades\Route;
 
@@ -37,6 +38,9 @@ Route::middleware('auth')->group(function () {
     Route::get('settings', [ProfileController::class, 'edit'])->name('settings');
     Route::get('/projects/{project}/image', [ProjectImageController::class, 'show'])->name('projects.image.show');
     Route::post('/projects/{project}/duplicate', [DuplicatedProjectController::class, 'store'])->name('projects.duplicate.store');
+
+    Route::patch('/projects/{project}/beads/{row}/{col}', [ProjectBeadController::class, 'update'])->name('projects.beads.update');
+    Route::delete('/projects/{project}/beads/{row}/{col}', [ProjectBeadController::class, 'destroy'])->name('projects.beads.destroy');
 });
 
 require __DIR__.'/auth.php';

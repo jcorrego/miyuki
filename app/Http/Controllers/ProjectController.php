@@ -52,7 +52,6 @@ class ProjectController extends Controller
      */
     public function show(Project $project)
     {
-        $project->refreshBeadCounters();
         $delicas = [];
         foreach ($project->delicas as $delica) {
             $delicas[$delica->id] = [
@@ -79,11 +78,27 @@ class ProjectController extends Controller
         usort($delicas, function ($a, $b) {
             return $a['count'] < $b['count'];
         });
+        $items = [];
+        for ($row = 1; $row <= $project->width; $row++) {
+            $items[$row] = [];
+            for ($col = 1; $col <= $project->long; $col++) {
+                $key = $row . '-' . $col;
+                $items[$row][$col] = [
+                    'rgb' => '#fff',
+                    'badge' => null,
+                ];
+                if (isset($beads[$key])) {
+                    $items[$row][$col]['rgb'] = $beads[$key]['rgb'];
+                    $items[$row][$col]['badge'] = $beads[$key]['badge'] > 0 ? $beads[$key]['badge'] : '';
+                }
+            }
+        }
         return Inertia::render('Project/Show', [
             'project' => $project,
-            'beads' => $beads,
             'delicas' => $delicas,
+            'items' => $items,
         ]);
+
     }
 
     /**
@@ -100,32 +115,17 @@ class ProjectController extends Controller
      */
     public function update(UpdateProjectRequest $request, Project $project)
     {
-        if ($request->has('bead_delica')) {
-            if (empty($request->bead_delica)) {
-                Bead::where('project_id', $project->id)
-                    ->where('row', $request->bead_row)
-                    ->where('col', $request->bead_col)
-                    ->delete();
-                return;
-            }
-            $bead = Bead::firstOrNew([
-                'project_id' => $project->id,
-                'row' => $request->bead_row,
-                'col' => $request->bead_col,
-            ]);
-            $bead->delica()->associate($request->bead_delica);
-            $bead->save();
-        }
-        elseif ($request->has('width')) {
+        if ($request->has('width')) {
             $project->width = $request->width;
             $project->long = $request->long;
             $project->type = $request->type;
             $project->name = $request->name;
             $project->save();
-            $beads = Bead::where('project_id', $project->id)
+            // Delete beads that are out of range.
+            Bead::where('project_id', $project->id)
                 ->where('row', '>', $request->width)
                 ->delete();
-            $beads = Bead::where('project_id', $project->id)
+            Bead::where('project_id', $project->id)
                 ->where('col', '>', $request->long)
                 ->delete();
         }

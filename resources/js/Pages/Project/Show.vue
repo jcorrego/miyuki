@@ -1,21 +1,19 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import { Head, useForm } from '@inertiajs/vue3';
+import { Head, useForm, router } from '@inertiajs/vue3';
 import GuidesToggle from '@/Miyuki/GuidesToggle.vue';
 import Toolbox from '@/Miyuki/Toolbox.vue';
 import Bead from '@/Miyuki/Bead.vue';
-import PreviewBead from '@/Miyuki/PreviewBead.vue';
 import { ref, computed } from 'vue';
 
 import { useToolsStore } from '@/stores/tools_store'
 const store = useToolsStore()
 
-const props = defineProps({ project: Object, beads: Object, delicas: Object })
+const props = defineProps({ project: Object, delicas: Object, items: Object })
 const rows = ref(props.project.width);
 const cols = ref(props.project.long);
 const type = ref(props.project.type);
 const name = ref(props.project.name);
-const beads = ref(props.beads)
 const zoom = ref(2);
 const isSelecting = ref(false)
 const selectedBeads = ref([])
@@ -38,25 +36,6 @@ const isSelected = (row, col) => {
     return selectedBeads.value.includes(row + '-' + col)
 }
 
-const getInitialDelica = (row, col) => {
-    if (beads.value.hasOwnProperty(row + '-' + col)) {
-        return beads.value[row + '-' + col]
-    }
-    return null
-}
-const getDelicaBadge = (row, col) => {
-   if (!beads.value.hasOwnProperty(row + '-' + col)) {
-       return null;
-    }
-    let delica = beads.value[row + '-' + col]
-    return delica.badge
-}
-
-const beadUpdateForm = useForm({
-    bead_row: null,
-    bead_col: null,
-    bead_delica: null
-})
 const projectUpdateForm = useForm({
     width: null,
     long: null,
@@ -64,38 +43,34 @@ const projectUpdateForm = useForm({
     name: null,
 })
 
-function submitBeadForm(delica_id, row, col) {
-    beadUpdateForm.bead_row = row
-    beadUpdateForm.bead_col = col
-    beadUpdateForm.bead_delica = delica_id
-    beadUpdateForm.put('/projects/' + props.project.id, {
-        preserveState: true,
-        preserveScroll: true,
-        onSuccess: (page) => {
-            beads.value = page.props.beads
-        },
-    });
-}
-
 function submitProjectForm() {
     projectUpdateForm.width = rows
     projectUpdateForm.long = cols
     projectUpdateForm.type = type
     projectUpdateForm.name = name
     projectUpdateForm.put('/projects/' + props.project.id, {
-        preserveState: true,
         preserveScroll: true,
     });
 }
 
 function handleClick(row, col) {
     if (store.tool === 'paint' && store.delica !== null) {
-        submitBeadForm(store.delica.id, row, col)
+        router.patch('/projects/' + props.project.id + '/beads/' + row + '/' + col,
+            {
+                delica_id: store.delica.id
+            },
+            {
+                preserveScroll: true,
+                only: ['items', 'delicas'],
+            })
     }
 }
 
 function handleDoubleClick(row, col) {
-    submitBeadForm(null, row, col)
+    router.delete('/projects/' + props.project.id + '/beads/' + row + '/' + col, {
+        preserveScroll: true,
+        only: ['items', 'delicas'],
+    })
 }
 
 function handleMouseDown(row, col) {
@@ -183,12 +158,12 @@ function pasteSelection() {
     store.clipboard.forEach(function (item) {
         let row = item.split('-')[0]
         let col = item.split('-')[1]
-        if (beads.value.hasOwnProperty(row + '-' + col)) {
-            submitBeadForm(beads.value[row + '-' + col].id, pasteRow, pasteCol)
-        }
-        else {
-            submitBeadForm(null, pasteRow, pasteCol)
-        }
+        // if (beads.value.hasOwnProperty(row + '-' + col)) {
+        //     submitBeadForm(beads.value[row + '-' + col].id, pasteRow, pasteCol)
+        // }
+        // else {
+        //     submitBeadForm(null, pasteRow, pasteCol)
+        // }
         // let newCol = parseInt(cols.value) - parseInt(col) + 1
         // newSelectedBeads.push(newRow + '-' + newCol)
     })
@@ -264,7 +239,7 @@ function pasteSelection() {
                         </div>
                     </div>
                     <div class="flex">
-                        <div class="w-5 bg-gradient-to-r from-slate-300 via-slate-100 to-slate-400"><div class="h-5 w-6"></div></div>
+                        <div class="w-5 bg-gradient-to-r from-slate-300 via-slate-100 to-slate-400"></div>
                         <div class="relative">
                             <div v-if="store.guides" class="absolute -top-5" >
                                 <div class="gap-px flex text-xs text-gray-400 leading-none">
@@ -273,11 +248,11 @@ function pasteSelection() {
                                     </div>
                                 </div>
                             </div>
-                            <div v-for="row in rows" :key="'row-' + row" class="gap-px flex select-none" :class="{'ml-2': type === 'Peyote' && row % 2 == 0}">
-                                <div v-for="col in cols" :key="'col-' + col" :class="[isSelected(row, col) ? 'border-2 border-indigo-500' : '', zoomClasses]">
+                            <div v-for="(cols, row) in items" :key="'row-' + row" class="gap-px flex select-none" :class="{'ml-2': type === 'Peyote' && row % 2 == 0}">
+                                <div v-for="(item, col) in cols" :key="'col-' + col" :class="[isSelected(row, col) ? 'border-2 border-indigo-500' : '', zoomClasses]">
                                     <Bead :key="row + '-' + col"
-                                        :initial-delica="getInitialDelica(row, col)"
-                                        :badge="getDelicaBadge(row, col)"
+                                        :color="item.rgb"
+                                        :badge="store.guides ? item.badge : null"
                                         @click="handleClick(row, col)"
                                         @dblclick="handleDoubleClick(row, col)"
                                         @mousedown="handleMouseDown(row, col)"
@@ -287,24 +262,10 @@ function pasteSelection() {
                                 </div>
                             </div>
                         </div>
-                        <div class="w-5 bg-gradient-to-r from-slate-300 via-slate-100 to-slate-400"><div class="h-5 w-6"></div></div>
-                    </div>
-                </div>
-                <div class="p-4 w-full border mb-4 justify-center bg-slate-50 overflow-x-auto">
-                    <div class="flex justify-center">
-                        <div class="w-4 bg-gradient-to-r from-slate-300 via-slate-100 to-slate-400"><div class="h-4 w-5"></div></div>
-                        <div>
-                            <div v-for="row in rows" :key="'row-' + row" class="gap-px flex" :class="{'ml-1': type === 'Peyote' && row % 2 == 0}">
-                                <div v-for="col in cols" :key="'col-' + col" class="h-2 w-2.5">
-                                    <PreviewBead :key="row + '-' + col" :delica="getInitialDelica(row, col)"/>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="w-4 bg-gradient-to-r from-slate-300 via-slate-100 to-slate-400"><div class="h-4 w-5"></div></div>
+                        <div class="w-5 bg-gradient-to-r from-slate-300 via-slate-100 to-slate-400"></div>
                     </div>
                 </div>
             </div>
         </div>
-
     </AuthenticatedLayout>
 </template>

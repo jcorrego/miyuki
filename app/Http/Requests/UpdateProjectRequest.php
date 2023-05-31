@@ -22,9 +22,6 @@ class UpdateProjectRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'bead_row' => ['numeric', 'min:1', 'max:1000'],
-            'bead_col' => ['numeric', 'min:1', 'max:1000'],
-            'bead_delica' => ['numeric', 'nullable'],
             'width' => ['numeric', 'min:1', 'max:1000'],
             'long' => ['numeric', 'min:1', 'max:1000'],
             'type' => ['max:50'],

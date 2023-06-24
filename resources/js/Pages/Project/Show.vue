@@ -248,7 +248,7 @@ function pasteSelection() {
                                     </div>
                                 </div>
                             </div>
-                            <div v-for="(cols, row) in items" :key="'row-' + row" class="gap-px flex select-none" :class="{'ml-2': type === 'Peyote' && row % 2 == 0}">
+                            <div v-for="(cols, row) in items" :key="'row-' + row" class="gap-px flex select-none" :class="{'ml-3': type === 'Peyote' && row % 2 == 0}">
                                 <div v-for="(item, col) in cols" :key="'col-' + col" :class="[isSelected(row, col) ? 'border-2 border-indigo-500' : '', zoomClasses]">
                                     <Bead :key="row + '-' + col"
                                         :color="item.rgb"

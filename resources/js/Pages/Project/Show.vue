@@ -5,6 +5,7 @@ import GuidesToggle from '@/Miyuki/GuidesToggle.vue';
 import Toolbox from '@/Miyuki/Toolbox.vue';
 import Bead from '@/Miyuki/Bead.vue';
 import { ref, computed } from 'vue';
+import { Switch } from '@headlessui/vue'
 
 import { useToolsStore } from '@/stores/tools_store'
 const store = useToolsStore()
@@ -12,6 +13,8 @@ const store = useToolsStore()
 const props = defineProps({ project: Object, delicas: Object, items: Object })
 const rows = ref(props.project.width);
 const cols = ref(props.project.long);
+const addRight = ref(true);
+const addBottom = ref(true);
 const type = ref(props.project.type);
 const name = ref(props.project.name);
 const zoom = ref(2);
@@ -38,14 +41,18 @@ const isSelected = (row, col) => {
 
 const projectUpdateForm = useForm({
     width: null,
+    bottom: true,
     long: null,
+    right: true,
     type: null,
     name: null,
 })
 
 function submitProjectForm() {
     projectUpdateForm.width = rows
+    projectUpdateForm.bottom = addBottom
     projectUpdateForm.long = cols
+    projectUpdateForm.right = addRight
     projectUpdateForm.type = type
     projectUpdateForm.name = name
     projectUpdateForm.put('/projects/' + props.project.id, {
@@ -188,17 +195,57 @@ function pasteSelection() {
                         <div class="relative rounded-md rounded-r-none px-3 pb-1.5 pt-2.5 ring-1 ring-inset ring-gray-300 focus-within:z-10 focus-within:ring-2 focus-within:ring-indigo-600 flex flex-col justify-between">
                             <GuidesToggle/>
                         </div>
-                        <div class="relative rounded-md rounded-l-none rounded-r-none px-3 pb-1.5 pt-2.5 ring-1 ring-inset ring-gray-300 focus-within:z-10 focus-within:ring-2 focus-within:ring-indigo-600 flex flex-col justify-between w-24">
-                            <label for="cols" class="block text-xs font-medium text-gray-500 text-right">Longitude</label>
-                            <input v-model.number="cols" @change="submitProjectForm" type="number" name="cols" id="cols"
-                            class="mt-2 block w-full border-0 p-0 py-1.5 pl-3 pr-1 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6 text-right"
-                            placeholder="How long is the bracelet" />
-                        </div>
-                        <div class="relative rounded-md rounded-l-none rounded-r-none px-3 pb-1.5 pt-2.5 ring-1 ring-inset ring-gray-300 focus-within:z-10 focus-within:ring-2 focus-within:ring-indigo-600 flex flex-col justify-between w-24">
-                            <label for="rows" class="block text-xs font-medium text-gray-500 text-right">Width</label>
-                            <input v-model.number="rows" @change="submitProjectForm" type="number" name="rows" id="rows"
+                        <div class="relative rounded-md rounded-l-none rounded-r-none px-3 pb-1.5 pt-2.5 ring-1 ring-inset ring-gray-300 focus-within:z-10 focus-within:ring-2 focus-within:ring-indigo-600 flex w-32">
+                            <div class="flex flex-col">
+                                <label for="cols" class="block text-xs font-medium text-gray-500 text-right">Longitude</label>
+                                <input v-model.number="cols" @change="submitProjectForm" type="number" name="cols" id="cols"
                                 class="mt-2 block w-full border-0 p-0 py-1.5 pl-3 pr-1 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6 text-right"
-                                placeholder="Width of the bracelet" />
+                                placeholder="How long is the bracelet" />
+                            </div>
+                            <div class="flex flex-col justify-between">
+                                <label for="rows" class="block text-xs font-medium text-gray-500 text-right">Side</label>
+                                <Switch v-model="addRight" :class="[addRight ? 'bg-indigo-600' : 'bg-gray-200', 'relative mt-2 inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2']">
+                                    <span class="sr-only">Add to the right</span>
+                                    <span :class="[addRight ? 'translate-x-5' : 'translate-x-0', 'pointer-events-none relative inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out']">
+                                    <span :class="[addRight ? 'opacity-0 duration-100 ease-out' : 'opacity-100 duration-200 ease-in', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']" aria-hidden="true">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-3 h-3 text-gray-400">
+                                            <path stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75" />
+                                        </svg>
+                                    </span>
+                                    <span :class="[addRight ? 'opacity-100 duration-200 ease-in' : 'opacity-0 duration-100 ease-out', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']" aria-hidden="true">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-3 h-3 text-indigo-600">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9" />
+                                        </svg>
+                                    </span>
+                                    </span>
+                                </Switch>
+                            </div>
+                        </div>
+                        <div class="relative rounded-md rounded-l-none rounded-r-none px-3 pb-1.5 pt-2.5 ring-1 ring-inset ring-gray-300 focus-within:z-10 focus-within:ring-2 focus-within:ring-indigo-600 flex w-28">
+                            <div class="flex flex-col">
+                                <label for="rows" class="block text-xs font-medium text-gray-500 text-right">Width</label>
+                                <input v-model.number="rows" @change="submitProjectForm" type="number" name="rows" id="rows"
+                                    class="mt-2 block w-full border-0 p-0 py-1.5 pl-3 pr-1 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6 text-right"
+                                    placeholder="Width of the bracelet" />
+                            </div>
+                            <div class="flex flex-col justify-between">
+                                <label for="rows" class="block text-xs font-medium text-gray-500 text-right">Side</label>
+                                <Switch v-model="addBottom" :class="[addBottom ? 'bg-indigo-600' : 'bg-gray-200', 'relative mt-2 inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2']">
+                                    <span class="sr-only">Add to the bottom</span>
+                                    <span :class="[addBottom ? 'translate-x-5' : 'translate-x-0', 'pointer-events-none relative inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out']">
+                                    <span :class="[addBottom ? 'opacity-0 duration-100 ease-out' : 'opacity-100 duration-200 ease-in', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']" aria-hidden="true">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-3 h-3 text-gray-400">
+                                            <path stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
+                                        </svg>
+                                    </span>
+                                    <span :class="[addBottom ? 'opacity-100 duration-200 ease-in' : 'opacity-0 duration-100 ease-out', 'absolute inset-0 flex h-full w-full items-center justify-center transition-opacity']" aria-hidden="true">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-3 h-3 text-indigo-600">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
+                                        </svg>
+                                    </span>
+                                    </span>
+                                </Switch>
+                            </div>
                         </div>
                         <div class="relative rounded-md rounded-l-none rounded-r-none px-3 pb-1.5 pt-2.5 ring-1 ring-inset ring-gray-300 focus-within:z-10 focus-within:ring-2 focus-within:ring-indigo-600 flex flex-col justify-between w-36">
                             <label for="type" class="block text-xs font-medium text-gray-500 text-right">Type</label>

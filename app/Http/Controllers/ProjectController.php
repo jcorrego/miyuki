@@ -116,18 +116,37 @@ class ProjectController extends Controller
     public function update(UpdateProjectRequest $request, Project $project)
     {
         if ($request->has('width')) {
-            $project->width = $request->width;
-            $project->long = $request->long;
+            if ($request->width != $project->width) {
+                $increase = $request->width > $project->width;
+                $project->width = $request->width;
+                if (!$request->bottom) {
+                    Bead::where('project_id', $project->id)
+                        ->update(['row' => Bead::raw('`row` ' . ($increase ? '+' : '-') . ' 1')]);
+                }
+                Bead::where('project_id', $project->id)
+                    ->where('row', '>', $request->width)
+                    ->delete();
+                Bead::where('project_id', $project->id)
+                    ->where('row', '<', 1)
+                    ->delete();
+            }
+            if ($request->long != $project->long) {
+                $increase = $request->long > $project->long;
+                $project->long = $request->long;
+                if (!$request->right) {
+                    Bead::where('project_id', $project->id)
+                        ->update(['col' => Bead::raw('`col` ' . ($increase ? '+' : '-') . ' 1')]);
+                }
+                Bead::where('project_id', $project->id)
+                    ->where('col', '>', $request->long)
+                    ->delete();
+                Bead::where('project_id', $project->id)
+                    ->where('col', '<', 1)
+                    ->delete();
+            }
             $project->type = $request->type;
             $project->name = $request->name;
             $project->save();
-            // Delete beads that are out of range.
-            Bead::where('project_id', $project->id)
-                ->where('row', '>', $request->width)
-                ->delete();
-            Bead::where('project_id', $project->id)
-                ->where('col', '>', $request->long)
-                ->delete();
         }
     }
 
